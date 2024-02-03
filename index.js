@@ -105,6 +105,31 @@ app.post("/verify-coupon", async (req, res) => {
   }
 });
 
+app.delete("/coupon/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if the user with the given ID exists
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Delete the user
+    await prisma.user.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.json({ message: "Coupon record deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Function to generate a random coupon number
 function generateRandomCoupon() {
   const couponLength = 8;
